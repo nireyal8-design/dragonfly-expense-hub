@@ -1,0 +1,50 @@
+{
+  "name": "WiseSpend",
+  "short_name": "WiseSpend",
+  "description": "Expense tracking and budget management application",
+  "start_url": "/dragonfly-expense-hub/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/dragonfly-expense-hub/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/dragonfly-expense-hub/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/dragonfly-expense-hub/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/dragonfly-expense-hub/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/dragonfly-expense-hub/screenshot-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "WiseSpend Desktop View"
+    },
+    {
+      "src": "/dragonfly-expense-hub/screenshot-mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "WiseSpend Mobile View"
+    }
+  ]
+}

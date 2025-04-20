@@ -1,0 +1,1 @@
+export type PaymentMethod = 'credit_card' | 'cash' | 'bank_transfer' | 'other'; 
