@@ -49,7 +49,7 @@ export default function Landing() {
               <span className="text-dragonfly-600">פשט</span> את ניהול ההוצאות שלך
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl">
-              עקוב אחר הוצאות, הפק דוחות, וקבל תובנות על דפוסי ההוצאות שלך עם Wisespend.
+              עקוב אחר הוצאות, הפק דוחות, וקבל תובנות על דפוסי ההוצאות שלך עם SpendWise.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/register">
@@ -67,7 +67,7 @@ export default function Landing() {
         {/* Features Section */}
         <section id="features" className="container py-16 md:py-24">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">?WisePend-למה לבחור ב</h2>
+            <h2 className="text-3xl font-bold mb-4">למה לבחור ב-SpendWise?</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               פתרון ניהול ההוצאות שלנו מתוכנן להפוך את המעקב הפיננסי לפשוט, יעיל ומלא תובנות.
             </p>
@@ -129,7 +129,7 @@ export default function Landing() {
           <div className="container text-center">
             <h2 className="text-3xl font-bold mb-4">מוכן לקחת שליטה על הפיננסים שלך?</h2>
             <p className="text-dragonfly-100 mb-8 max-w-2xl mx-auto">
-              הצטרף לאלפי משתמשים ששינו את ניהול הפיננסים שלהם עם Wisespend.
+              הצטרף לאלפי משתמשים ששינו את ניהול הפיננסים שלהם עם SpendWise.
             </p>
             <Link to="/register">
               <Button size="lg" variant="secondary" className="bg-white text-dragonfly-700 hover:bg-gray-100">
@@ -144,7 +144,7 @@ export default function Landing() {
         <div className="container flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
             <Logo size="small" />
-            <span className="text-sm text-muted-foreground">© 2025 Wisespend. כל הזכויות שמורות.</span>
+            <span className="text-sm text-muted-foreground">© 2025 SpendWise. כל הזכויות שמורות.</span>
           </div>
           <div className="flex gap-6">
             <a href="#" className="text-sm text-muted-foreground hover:text-dragonfly-600 transition-colors">

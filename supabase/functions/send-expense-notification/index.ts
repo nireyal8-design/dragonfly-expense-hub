@@ -115,7 +115,7 @@ serve(async (req) => {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <meta name="x-apple-disable-message-reformatting">
-            <title>WiseSpend Expense Notification</title>
+            <title>SpendWise Expense Notification</title>
             <style>
               body {
                 font-family: Arial, sans-serif;
@@ -189,7 +189,7 @@ serve(async (req) => {
                       <path d="M17 6h6v6" />
                     </svg>
                   </div>
-                  <h1 style="margin: 0; color: white;">WiseSpend - עדכון הוצאות</h1>
+                  <h1 style="margin: 0; color: white;">SpendWise - עדכון הוצאות</h1>
                 </div>
               </div>
               <div class="content">
@@ -208,11 +208,11 @@ serve(async (req) => {
               
               <div class="footer">
                 <p>
-                  הודעת דוא"ל זו נשלחה מ-WiseSpend.<br>
+                  הודעת דוא"ל זו נשלחה מ-SpendWise.<br>
                   כתובת: רחוב הברזל 3, תל אביב, ישראל
                 </p>
                 <p>
-                  © ${new Date().getFullYear()} WiseSpend. כל הזכויות שמורות.
+                  © ${new Date().getFullYear()} SpendWise. כל הזכויות שמורות.
                 </p>
                 <p>
                   אם אינך רוצה לקבל הודעות אלו, תוכל לשנות את העדפות ההתראות שלך 
@@ -241,11 +241,11 @@ serve(async (req) => {
             }],
             from: {
               email: 'dragonflycustomercontact@gmail.com',
-              name: 'WiseSpend'
+              name: 'SpendWise'
             },
             reply_to: {
               email: 'dragonflycustomercontact@gmail.com',
-              name: 'WiseSpend Support'
+              name: 'SpendWise Support'
             },
             subject: `הוצאה חדשה: ${expense.name} - ₪${expense.amount.toLocaleString()}`,
             content: [{

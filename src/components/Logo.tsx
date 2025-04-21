@@ -29,7 +29,7 @@ export function Logo({ size = "medium", withText = true }: LogoProps) {
       </div>
       {withText && (
         <span className={`font-bold ${sizes[size].text} text-dragonfly-700`}>
-          WiseSpend
+          SpendWise
         </span>
       )}
     </div>

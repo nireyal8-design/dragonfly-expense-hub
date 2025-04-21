@@ -66,7 +66,7 @@ serve(async (req) => {
           }],
           from: {
             email: 'dragonflycustomercontact@gmail.com',
-            name: 'WiseSpend Support'
+            name: 'SpendWise Support'
           },
           subject: 'Test Support Email',
           content: [{

@@ -22,7 +22,7 @@ const LogoVariant = ({ Icon, name }: { Icon: any; name: string }) => {
           <div className="absolute inset-0 bg-primary/10 blur-xl rounded-full" />
         </div>
         <span className="font-bold text-2xl text-dragonfly-700">
-          WiseSpend
+          SpendWise
         </span>
       </div>
       <p className="text-sm text-muted-foreground">{name}</p>
@@ -49,7 +49,7 @@ const CombinedLogoVariant = () => {
           <div className="absolute inset-0 bg-primary/10 blur-xl rounded-full" />
         </div>
         <span className="font-bold text-2xl text-dragonfly-700">
-          WiseSpend
+          SpendWise
         </span>
       </div>
       <p className="text-sm text-muted-foreground">Wallet + Trending Up Combination</p>
@@ -60,7 +60,7 @@ const CombinedLogoVariant = () => {
 export function LogoPreview() {
   return (
     <div className="container py-8">
-      <h2 className="text-2xl font-bold mb-6">בחר לוגו חדש ל-WiseSpend</h2>
+      <h2 className="text-2xl font-bold mb-6">בחר לוגו חדש ל-SpendWise</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <LogoVariant Icon={CreditCard} name="Current Logo (Credit Card)" />
         <LogoVariant Icon={Wallet} name="Wallet" />

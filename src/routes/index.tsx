@@ -5,6 +5,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import Settings from '@/pages/Settings';
 import NotFound from '@/pages/NotFound';
+import AuthCallback from '@/pages/AuthCallback';
 
 export const router = createBrowserRouter(
   [
@@ -27,6 +28,10 @@ export const router = createBrowserRouter(
         {
           path: '/settings',
           element: <Settings />,
+        },
+        {
+          path: '/auth/callback',
+          element: <AuthCallback />,
         },
         {
           path: '*',

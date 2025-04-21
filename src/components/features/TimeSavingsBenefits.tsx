@@ -166,7 +166,7 @@ export function TimeSavingsBenefits() {
 
       <footer className="border-t mt-16">
         <div className="container py-6 text-center text-sm text-muted-foreground">
-          © 2025 WiseSpend כל הזכויות שמורות.
+          © 2025 SpendWise כל הזכויות שמורות.
         </div>
       </footer>
     </div>

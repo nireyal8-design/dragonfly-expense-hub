@@ -7,9 +7,17 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ command, mode }) => ({
   server: {
     host: "::",
-    port: 8080,
+    port: 8085,
     headers: {
-      'Content-Type': 'application/javascript'
+      'Content-Language': 'he'
+    },
+    proxy: {
+      '/auth/callback': {
+        target: 'http://localhost:8085',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/auth\/callback/, '')
+      }
     }
   },
   plugins: [
@@ -28,6 +36,11 @@ export default defineConfig(({ command, mode }) => ({
     modules: {
       localsConvention: 'camelCase',
     },
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "@/styles/variables.scss";`
+      }
+    }
   },
   build: {
     outDir: 'dist',
@@ -49,4 +62,7 @@ export default defineConfig(({ command, mode }) => ({
   },
   publicDir: 'public',
   assetsInclude: ['**/*.png', '**/*.ico', '**/*.webmanifest'],
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom']
+  }
 }));

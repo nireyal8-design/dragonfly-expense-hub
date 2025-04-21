@@ -1,6 +1,6 @@
 {
-  "name": "WiseSpend",
-  "short_name": "WiseSpend",
+  "name": "SpendWise",
+  "short_name": "SpendWise",
   "description": "Expense tracking and budget management application",
   "start_url": "/dragonfly-expense-hub/",
   "display": "standalone",
@@ -33,18 +33,16 @@
   ],
   "screenshots": [
     {
-      "src": "/dragonfly-expense-hub/screenshot-desktop.png",
+      "src": "/screenshots/desktop.png",
       "sizes": "1920x1080",
       "type": "image/png",
-      "form_factor": "wide",
-      "label": "WiseSpend Desktop View"
+      "label": "SpendWise Desktop View"
     },
     {
-      "src": "/dragonfly-expense-hub/screenshot-mobile.png",
-      "sizes": "1080x1920",
+      "src": "/screenshots/mobile.png",
+      "sizes": "750x1334",
       "type": "image/png",
-      "form_factor": "narrow",
-      "label": "WiseSpend Mobile View"
+      "label": "SpendWise Mobile View"
     }
   ]
 }

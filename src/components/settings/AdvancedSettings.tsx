@@ -129,7 +129,7 @@ const logoHtml = `
         <path d="M17 6h6v6" />
       </svg>
     </div>
-    <span style="font-size: 24px; font-weight: bold; color: #1a5f7a;">WiseSpend</span>
+    <span style="font-size: 24px; font-weight: bold; color: #1a5f7a;">SpendWise</span>
   </div>
 `;
 
