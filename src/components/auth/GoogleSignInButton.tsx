@@ -34,14 +34,13 @@ export function GoogleSignInButton() {
       setIsLoading(true);
       console.log('Starting Google sign-in...');
       
-      const result = await signInWithGoogle();
+      const { url } = await signInWithGoogle();
       
-      if (!result?.url) {
-        throw new Error('Failed to get Google sign-in URL');
+      if (!url) {
+        throw new Error('No URL returned from Google OAuth');
       }
       
-      console.log('Redirecting to Google sign-in URL:', result.url);
-      window.location.href = result.url;
+      // The redirect will be handled by Supabase's built-in handling
     } catch (error: any) {
       console.error('Error signing in with Google:', error);
       toast.error(error.message || 'שגיאה בהתחברות עם Google');
