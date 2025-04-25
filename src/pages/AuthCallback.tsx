@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-export function AuthCallback() {
+export default function AuthCallback() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
