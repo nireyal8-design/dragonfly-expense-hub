@@ -11,7 +11,9 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Get the current URL and construct the callback URL
 const getCallbackUrl = () => {
   const url = new URL(window.location.href);
-  return `${url.origin}/dragonfly-expense-hub/auth/callback`;
+  const isProduction = process.env.NODE_ENV === 'production';
+  const basePath = isProduction ? '/dragonfly-expense-hub' : '';
+  return `${url.origin}${basePath}/auth/callback`;
 };
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {

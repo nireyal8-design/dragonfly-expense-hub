@@ -94,6 +94,7 @@ export default defineConfig(({ command, mode }) => ({
     }
   },
   define: {
-    'process.env.BASE_URL': JSON.stringify('/dragonfly-expense-hub/')
+    'process.env.BASE_URL': JSON.stringify('/dragonfly-expense-hub/'),
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
   }
 }));
