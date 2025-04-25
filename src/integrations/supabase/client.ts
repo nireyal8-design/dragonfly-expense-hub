@@ -13,7 +13,10 @@ const getCallbackUrl = () => {
   const url = new URL(window.location.href);
   const isProduction = process.env.NODE_ENV === 'production';
   const basePath = isProduction ? '/dragonfly-expense-hub' : '';
-  return `${url.origin}${basePath}/auth/callback`;
+  // Remove any existing hash or query parameters
+  const cleanUrl = `${url.origin}${basePath}/auth/callback`;
+  console.log('Callback URL:', cleanUrl);
+  return cleanUrl;
 };
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -41,13 +44,18 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
 // Export a function to handle Google login with the correct redirect URL
 export const signInWithGoogle = async () => {
   try {
+    console.log('Starting Google sign-in...');
+    const callbackUrl = getCallbackUrl();
+    console.log('Using callback URL:', callbackUrl);
+
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: getCallbackUrl(),
+        redirectTo: callbackUrl,
         queryParams: {
           access_type: 'offline',
-          prompt: 'consent'
+          prompt: 'consent',
+          response_type: 'code'
         }
       }
     });
@@ -57,10 +65,11 @@ export const signInWithGoogle = async () => {
       throw error;
     }
     
-    if (!data.url) {
+    if (!data?.url) {
       throw new Error('No URL returned from Google OAuth');
     }
     
+    console.log('Redirecting to Google sign-in URL:', data.url);
     return data;
   } catch (error) {
     console.error('Error in signInWithGoogle:', error);
