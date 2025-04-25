@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock } from "lucide-react";
 
 export function ProfileSettings() {
   const [isLoading, setIsLoading] = useState(true);
@@ -33,8 +33,10 @@ export function ProfileSettings() {
         return;
       }
 
-      // Check if user is authenticated with Google
-      setIsGoogleUser(user.app_metadata?.provider === 'google');
+      // Check if user is a Google user by looking at the provider
+      const isGoogleAuth = user.app_metadata?.provider === 'google';
+      
+      setIsGoogleUser(isGoogleAuth);
 
       // Get user metadata from auth
       setUserData({
@@ -58,19 +60,17 @@ export function ProfileSettings() {
       if (userError) throw userError;
       if (!user) throw new Error("משתמש לא מחובר");
 
-      // Only update metadata if not a Google user
-      if (!isGoogleUser) {
-        const { error: updateError } = await supabase.auth.updateUser({
-          data: {
-            first_name: userData.first_name,
-            last_name: userData.last_name,
-          }
-        });
+      // Update user metadata in auth
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: {
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+        }
+      });
 
-        if (updateError) throw updateError;
-      }
+      if (updateError) throw updateError;
 
-      // Only update email if not a Google user
+      // Update email if changed and not a Google user
       if (!isGoogleUser && userData.email !== user.email) {
         const { error: emailError } = await supabase.auth.updateUser({
           email: userData.email,
@@ -113,8 +113,21 @@ export function ProfileSettings() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>הגדרות פרופיל</CardTitle>
-        <CardDescription>עדכן את פרטי הפרופיל שלך</CardDescription>
+        <CardTitle className="flex items-center gap-2">
+          הגדרות פרופיל
+          {isGoogleUser && (
+            <div className="flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-700">
+              <Lock className="h-4 w-4" />
+              Google משתמש
+            </div>
+          )}
+        </CardTitle>
+        <CardDescription>
+          {isGoogleUser 
+            ? "פרטי המשתמש מנוהלים על ידי חשבון Google שלך"
+            : "עדכן את פרטי הפרופיל שלך"
+          }
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid gap-4">
@@ -127,13 +140,8 @@ export function ProfileSettings() {
                 onChange={(e) => setUserData(prev => ({ ...prev, first_name: e.target.value }))}
                 placeholder="הזן שם פרטי"
                 disabled={isGoogleUser}
-                className={isGoogleUser ? "bg-gray-100" : ""}
+                className={isGoogleUser ? "bg-gray-100 cursor-not-allowed opacity-60" : ""}
               />
-              {isGoogleUser && (
-                <p className="text-sm text-gray-500 mt-1">
-                  לא ניתן לשנות את השם הפרטי למשתמשים שהתחברו דרך Google
-                </p>
-              )}
             </div>
             <div>
               <Label htmlFor="last_name">שם משפחה</Label>
@@ -143,35 +151,37 @@ export function ProfileSettings() {
                 onChange={(e) => setUserData(prev => ({ ...prev, last_name: e.target.value }))}
                 placeholder="הזן שם משפחה"
                 disabled={isGoogleUser}
-                className={isGoogleUser ? "bg-gray-100" : ""}
+                className={isGoogleUser ? "bg-gray-100 cursor-not-allowed opacity-60" : ""}
               />
-              {isGoogleUser && (
-                <p className="text-sm text-gray-500 mt-1">
-                  לא ניתן לשנות את שם המשפחה למשתמשים שהתחברו דרך Google
-                </p>
-              )}
             </div>
           </div>
 
           <div>
             <Label htmlFor="email">אימייל</Label>
-            <Input
-              id="email"
-              type="email"
-              value={userData.email}
-              onChange={(e) => setUserData(prev => ({ ...prev, email: e.target.value }))}
-              placeholder="הזן כתובת אימייל"
-              disabled={isGoogleUser}
-              className={isGoogleUser ? "bg-gray-100" : ""}
-            />
-            {isGoogleUser && (
-              <p className="text-sm text-gray-500 mt-1">
-                לא ניתן לשנות את כתובת האימייל למשתמשים שהתחברו דרך Google
-              </p>
-            )}
+            <div className="relative">
+              <Input
+                id="email"
+                type="email"
+                value={userData.email}
+                onChange={(e) => setUserData(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="הזן כתובת אימייל"
+                disabled={isGoogleUser}
+                className={isGoogleUser ? "bg-gray-100 cursor-not-allowed opacity-60 pr-10" : "pr-10"}
+              />
+              {isGoogleUser && (
+                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              )}
+            </div>
           </div>
 
-          {!isGoogleUser && (
+          {isGoogleUser ? (
+            <div className="rounded-md bg-blue-50 p-4 text-sm text-blue-700">
+              <div className="flex items-center gap-2">
+                <Lock className="h-4 w-4" />
+                <p>הסיסמה מנוהלת על ידי חשבון Google שלך</p>
+              </div>
+            </div>
+          ) : (
             <div>
               <Label htmlFor="password">סיסמה חדשה</Label>
               <div className="relative">
@@ -204,20 +214,21 @@ export function ProfileSettings() {
           )}
         </div>
 
-        <Button 
-          onClick={handleUpdateProfile} 
-          disabled={isSaving}
-          className="w-full"
-        >
-          {isSaving ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              מעדכן...
-            </>
-          ) : (
-            "שמור שינויים"
-          )}
-        </Button>
+        <div className="flex justify-end">
+          <Button
+            onClick={handleUpdateProfile}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                מעדכן...
+              </>
+            ) : (
+              "שמור שינויים"
+            )}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

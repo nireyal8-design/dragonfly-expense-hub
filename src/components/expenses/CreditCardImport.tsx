@@ -5,10 +5,13 @@ import { Upload, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
-import { getDocument } from 'pdfjs-dist/legacy/build/pdf';
+import * as pdfjsLib from 'pdfjs-dist';
+import { getDocument } from 'pdfjs-dist';
 import { addMonths, format } from 'date-fns';
 import { Database } from '../../types/supabase';
+
+// Set the worker source
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 // Singleton for worker initialization
 let workerInitialized = false;
@@ -18,11 +21,6 @@ const initializeWorker = () => {
   
   console.log('PDF.js version:', pdfjsLib.version);
   console.log('Initializing PDF.js worker...');
-  
-  // Set worker source to use the CDN version
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-  
-  console.log('Worker source set to:', pdfjsLib.GlobalWorkerOptions.workerSrc);
   workerInitialized = true;
 };
 
@@ -221,8 +219,17 @@ function parseTransactions(text: string): Transaction[] {
                   category = categoryLine.trim();
                 }
               }
+            } else {
+              // If next line is not a business name, use the current line without "לא הוצג"
+              name = cleanLine.replace('לא הוצג', '').trim();
             }
+          } else {
+            // If there's no next line, use the current line without "לא הוצג"
+            name = cleanLine.replace('לא הוצג', '').trim();
           }
+        } else if (cleanLine.includes('לא הוצג')) {
+          // Remove "לא הוצג" from the name if it appears anywhere in the line
+          name = cleanLine.replace('לא הוצג', '').trim();
         }
 
         transactions.push({

@@ -21,7 +21,9 @@ export default defineConfig(({ command, mode }) => ({
     }
   },
   plugins: [
-    react(),
+    react({
+      jsxImportSource: 'react'
+    }),
     command === 'serve' &&
     componentTagger(),
   ].filter(Boolean),
@@ -29,6 +31,7 @@ export default defineConfig(({ command, mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "react": path.resolve(__dirname, "node_modules/react"),
     },
   },
   css: {
@@ -45,7 +48,14 @@ export default defineConfig(({ command, mode }) => ({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    commonjsOptions: {
+      include: [/node_modules/],
+      extensions: ['.js', '.cjs'],
+      strictRequires: true,
+      transformMixedEsModules: true,
+    },
     rollupOptions: {
+      external: ['react/jsx-runtime'],
       output: {
         format: 'es',
         entryFileNames: 'assets/[name]-[hash].js',
@@ -63,6 +73,18 @@ export default defineConfig(({ command, mode }) => ({
   publicDir: 'public',
   assetsInclude: ['**/*.png', '**/*.ico', '**/*.webmanifest'],
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom']
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'pdfjs-dist',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-context',
+      '@radix-ui/react-compose-refs'
+    ],
+    esbuildOptions: {
+      jsx: 'automatic'
+    }
   }
 }));

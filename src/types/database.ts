@@ -17,6 +17,10 @@ export type Database = {
           payment_method: string;
           notes: string | null;
           created_at: string;
+          has_reminder: boolean;
+          reminder_days_before: number;
+          reminder_notification: boolean;
+          reminder_email: boolean;
         };
         Insert: {
           id?: string;
@@ -33,6 +37,10 @@ export type Database = {
           payment_method?: string;
           notes?: string | null;
           created_at?: string;
+          has_reminder?: boolean;
+          reminder_days_before?: number;
+          reminder_notification?: boolean;
+          reminder_email?: boolean;
         };
         Update: {
           id?: string;
@@ -49,6 +57,42 @@ export type Database = {
           payment_method?: string;
           notes?: string | null;
           created_at?: string;
+          has_reminder?: boolean;
+          reminder_days_before?: number;
+          reminder_notification?: boolean;
+          reminder_email?: boolean;
+        };
+      };
+      goals: {
+        Row: {
+          id: string;
+          created_at: string;
+          name: string;
+          target_amount: number;
+          allocation_percentage: number;
+          deadline: string | null;
+          notes: string | null;
+          user_id: string;
+        };
+        Insert: {
+          id?: string;
+          created_at?: string;
+          name: string;
+          target_amount: number;
+          allocation_percentage: number;
+          deadline?: string | null;
+          notes?: string | null;
+          user_id: string;
+        };
+        Update: {
+          id?: string;
+          created_at?: string;
+          name?: string;
+          target_amount?: number;
+          allocation_percentage?: number;
+          deadline?: string | null;
+          notes?: string | null;
+          user_id?: string;
         };
       };
       credit_cardimport_data: {

@@ -77,20 +77,46 @@ const paymentMethods = [
   { value: 'bank_transfer', label: 'העברה בנקאית' },
 ] as const;
 
+const recurringFrequencies = [
+  { value: 'monthly', label: 'חודשי' },
+  { value: 'bimonthly', label: 'כל חודשיים' },
+  { value: 'quarterly', label: 'רבעוני' },
+  { value: 'yearly', label: 'שנתי' },
+] as const;
+
+interface FormData {
+  name: string;
+  amount: string;
+  category: string;
+  customCategory: string;
+  currency: string;
+  payment_method: PaymentMethod;
+  notes: string;
+  date: string;
+  is_recurring: boolean;
+  recurring_day: number;
+  has_reminder: boolean;
+  reminder_days_before: number;
+  reminder_notification: boolean;
+  reminder_email: boolean;
+}
+
 export function EditExpenseForm({ expense, onClose, onUpdateExpense }: EditExpenseFormProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: expense.name,
-    amount: String(expense.amount),
-    category: expense.category || "כללי",
-    customCategory: "",
-    currency: expense.currency || "ILS",
-    payment_method: expense.payment_method || 'credit' as PaymentMethod,
+    amount: expense.amount.toString(),
+    category: expense.category || '',
+    customCategory: '',
+    currency: expense.currency,
+    payment_method: expense.payment_method,
     notes: expense.notes || '',
     date: expense.date,
-    is_recurring: expense.is_recurring || false,
+    is_recurring: expense.is_recurring,
     recurring_day: expense.recurring_day || 1,
-    recurring_frequency: expense.recurring_frequency || 'monthly' as const,
-    is_active: expense.is_active || true,
+    has_reminder: expense.has_reminder || false,
+    reminder_days_before: expense.reminder_days_before || 0,
+    reminder_notification: expense.reminder_notification || true,
+    reminder_email: expense.reminder_email || false
   });
   const [date, setDate] = useState<Date>(new Date(expense.date));
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -126,100 +152,40 @@ export function EditExpenseForm({ expense, onClose, onUpdateExpense }: EditExpen
         ? formData.customCategory
         : selectedCategory.value;
       
-      // First, update the current expense
-      const { data: expenseData, error: expenseError } = await supabase
+      const isRecurring = formData.is_recurring;
+      const recurringDay = formData.recurring_day;
+      
+      const { data, error } = await supabase
         .from('expenses')
         .update({
           name: formData.name,
           amount: amount,
-          currency: formData.currency,
-          date: formData.date,
-          transaction_date: formData.date,
           category: finalCategory,
+          date: date.toISOString(),
+          currency: selectedCurrency.value,
           payment_method: formData.payment_method as PaymentMethod,
-          is_recurring: formData.is_recurring,
-          recurring_day: formData.recurring_day,
-          recurring_frequency: formData.recurring_frequency,
-          notes: formData.notes
+          notes: formData.notes,
+          is_recurring: isRecurring,
+          recurring_day: isRecurring ? recurringDay : null,
+          has_reminder: formData.has_reminder,
+          reminder_days_before: formData.reminder_days_before,
+          reminder_notification: formData.reminder_notification,
+          reminder_email: formData.reminder_email,
         })
         .eq('id', expense.id)
         .select()
         .single();
       
-      if (expenseError) throw expenseError;
+      if (error) throw error;
 
-      if (formData.is_recurring) {
-        // If this is a recurring expense and the charge day was changed
-        if (formData.recurring_day !== expense.recurring_day) {
-          // Find all future occurrences of this expense
-          const { data: futureExpenses, error: futureError } = await supabase
-            .from('expenses')
-            .select('*')
-            .eq('name', formData.name)
-            .eq('user_id', expenseData.user_id)
-            .eq('is_recurring', true)
-            .gt('date', expenseData.date)
-            .order('date', { ascending: true });
-
-          if (futureError) throw futureError;
-
-          // Update all future occurrences with the new charge day
-          if (futureExpenses && futureExpenses.length > 0) {
-            const updates = futureExpenses.map(exp => ({
-              id: exp.id,
-              name: exp.name,
-              amount: exp.amount,
-              user_id: exp.user_id,
-              recurring_day: formData.recurring_day,
-              date: new Date(new Date(exp.date).setDate(formData.recurring_day)).toISOString(),
-              is_recurring: true,
-              recurring_frequency: exp.recurring_frequency,
-              category: exp.category,
-              currency: exp.currency,
-              payment_method: exp.payment_method,
-              notes: exp.notes
-            }));
-
-            const { error: updateError } = await supabase
-              .from('expenses')
-              .upsert(updates);
-
-            if (updateError) throw updateError;
-          }
-        }
-
-        // Update the recurring expense template
-        const { error: recurringError } = await supabase
-          .from('recurring_expenses')
-          .upsert([
-            {
-              user_id: expenseData.user_id,
-              name: formData.name,
-              amount: amount,
-              category: finalCategory,
-              currency: formData.currency,
-              recurring_day: formData.recurring_day,
-              recurring_frequency: formData.recurring_frequency,
-            }
-          ]);
-        
-        if (recurringError) throw recurringError;
-      } else {
-        // If recurring is turned off, delete the recurring template
-        const { error: deleteError } = await supabase
-          .from('recurring_expenses')
-          .delete()
-          .eq('name', expenseData.name)
-          .eq('user_id', expenseData.user_id);
-        
-        if (deleteError) console.error('Error deleting recurring template:', deleteError);
-      }
-      
       const updatedExpense: Expense = {
-        ...expenseData,
-        is_recurring: formData.is_recurring,
-        recurring_day: formData.recurring_day,
-        recurring_frequency: formData.recurring_frequency,
+        ...data,
+        is_recurring: isRecurring,
+        recurring_day: isRecurring ? recurringDay : null,
+        has_reminder: formData.has_reminder,
+        reminder_days_before: formData.reminder_days_before,
+        reminder_notification: formData.reminder_notification,
+        reminder_email: formData.reminder_email,
         payment_method: formData.payment_method as PaymentMethod
       };
       
@@ -401,26 +367,37 @@ export function EditExpenseForm({ expense, onClose, onUpdateExpense }: EditExpen
           )}
           
           <div className="grid gap-4">
-            <div className="flex items-center justify-between">
-              <Label>הוצאה חודשית חוזרת</Label>
+            <div className="flex items-center space-x-2">
               <Switch
+                id="is_recurring"
                 checked={formData.is_recurring}
-                onCheckedChange={(value) => setFormData(prev => ({ ...prev, is_recurring: value }))}
+                onCheckedChange={(checked) => {
+                  setFormData(prev => ({ ...prev, is_recurring: checked }));
+                }}
               />
+              <Label htmlFor="is_recurring">הוצאה חוזרת</Label>
             </div>
-            
+
             {formData.is_recurring && (
-              <div className="grid gap-2">
-                <Label htmlFor="recurringDay">יום בחודש לחיוב</Label>
-                <Input
-                  id="recurringDay"
-                  type="number"
-                  min="1"
-                  max="31"
-                  value={formData.recurring_day}
-                  onChange={(e) => setFormData(prev => ({ ...prev, recurring_day: parseInt(e.target.value) }))}
-                  required={formData.is_recurring}
-                />
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="recurring_day">יום בחודש</Label>
+                    <Input
+                      id="recurring_day"
+                      type="number"
+                      min="1"
+                      max="31"
+                      value={formData.recurring_day}
+                      onChange={(e) => {
+                        const day = parseInt(e.target.value);
+                        if (day >= 1 && day <= 31) {
+                          setFormData(prev => ({ ...prev, recurring_day: day }));
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -454,6 +431,54 @@ export function EditExpenseForm({ expense, onClose, onUpdateExpense }: EditExpen
               onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
               placeholder="הוסף הערות נוספות..."
             />
+          </div>
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label>הגדר תזכורת</Label>
+              <Switch
+                checked={formData.has_reminder}
+                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, has_reminder: checked }))}
+              />
+            </div>
+            
+            {formData.has_reminder && (
+              <div className="space-y-4 pl-4 border-l-2 border-muted">
+                <div>
+                  <Label htmlFor="reminder_days_before">מספר ימים לפני התשלום</Label>
+                  <Input
+                    id="reminder_days_before"
+                    type="number"
+                    min="0"
+                    value={formData.reminder_days_before}
+                    onChange={(e) => setFormData(prev => ({ ...prev, reminder_days_before: parseInt(e.target.value) || 0 }))}
+                    required={formData.has_reminder}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>אמצעי התראה</Label>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="reminder_notification">התראה במערכת</Label>
+                      <Switch
+                        id="reminder_notification"
+                        checked={formData.reminder_notification}
+                        onCheckedChange={(checked) => setFormData(prev => ({ ...prev, reminder_notification: checked }))}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="reminder_email">התראה במייל</Label>
+                      <Switch
+                        id="reminder_email"
+                        checked={formData.reminder_email}
+                        onCheckedChange={(checked) => setFormData(prev => ({ ...prev, reminder_email: checked }))}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
           
           <DialogFooter className="mt-6">

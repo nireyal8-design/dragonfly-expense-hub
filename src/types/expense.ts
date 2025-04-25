@@ -6,13 +6,16 @@ export interface Expense {
   name: string;
   amount: number;
   currency: string;
-  date: string;
-  transaction_date?: string | null;
   category: string;
-  payment_method?: PaymentMethod;
+  date: string;
+  payment_method: PaymentMethod;
   is_recurring: boolean;
-  recurring_day: number | null;
-  recurring_frequency: 'monthly' | 'bimonthly' | 'quarterly' | 'yearly' | null;
-  notes: string;
+  recurring_frequency?: 'monthly' | 'bimonthly' | 'quarterly' | 'yearly';
+  recurring_day?: number;
+  notes?: string;
   is_active?: boolean;
+  has_reminder?: boolean;
+  reminder_days_before?: number;
+  reminder_notification?: boolean;
+  reminder_email?: boolean;
 }

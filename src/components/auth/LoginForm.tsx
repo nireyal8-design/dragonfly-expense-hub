@@ -165,7 +165,7 @@ export function LoginForm() {
                 autoCorrect="off"
                 disabled={isLoading}
                 required
-                className="pl-10"
+                className="pl-10 pr-10"
                 value={formData.password}
                 onChange={handleChange}
               />
@@ -173,7 +173,7 @@ export function LoginForm() {
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-2 top-2 h-6 w-6"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (

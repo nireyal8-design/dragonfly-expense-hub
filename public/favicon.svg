@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="#1a5f7a" />
+  
+  <!-- Wallet icon -->
+  <path d="M384 160H128a32 32 0 0 0 0 64h256a32 32 0 0 0 0-64z" fill="white" />
+  <path d="M384 96H128a32 32 0 0 0 0 64h256a32 32 0 0 0 0-64z" fill="white" />
+  <path d="M384 224H128a32 32 0 0 0 0 64h256a32 32 0 0 0 0-64z" fill="white" />
+  
+  <!-- Trending up icon -->
+  <path d="M352 160l-64 64-32-32-96 96" stroke="#22c55e" stroke-width="24" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M352 96v64h64" stroke="#22c55e" stroke-width="24" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+</svg> 

@@ -1,4 +1,3 @@
-
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Link } from "react-router-dom";
@@ -18,9 +17,9 @@ export default function Login() {
       }
       hebrewContent={
         <>
-          <h1 className="text-4xl font-bold">Dragonfly Expense Hub</h1>
+          <h1 className="text-4xl font-bold">SpendWise</h1>
           <p className="text-lg text-dragonfly-100">
-            פשט את ניהול הכספים שלך, עקוב אחר הוצאות בקלות, וקבל תובנות בעלות ערך. הצטרף לאלפי משתמשים ששינו את ניהול הכספים שלהם עם Dragonfly.
+            פשט את ניהול הכספים שלך, עקוב אחר הוצאות בקלות, וקבל תובנות בעלות ערך. הצטרף לאלפי משתמשים ששינו את ניהול הכספים שלהם עם SpendWise.
           </p>
         </>
       }

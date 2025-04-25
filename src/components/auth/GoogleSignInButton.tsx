@@ -42,13 +42,13 @@ export function GoogleSignInButton() {
       
       // Get the current URL and port
       const currentUrl = new URL(window.location.href);
-      const isLocalhost = currentUrl.hostname === 'localhost';
-      const port = currentUrl.port;
+      const isLocalhost = currentUrl.hostname === 'localhost' || currentUrl.hostname === '127.0.0.1';
+      const port = currentUrl.port || '8086'; // Default to port 8086 if not specified
       
       // Set the redirect URL based on environment
       const redirectUrl = isLocalhost 
         ? `${currentUrl.protocol}//${currentUrl.hostname}:${port}/auth/callback`
-        : 'https://dragonfly-expense-hub.vercel.app/auth/callback';
+        : `${currentUrl.protocol}//${currentUrl.host}/auth/callback`;
 
       console.log('Redirecting to:', redirectUrl);
 

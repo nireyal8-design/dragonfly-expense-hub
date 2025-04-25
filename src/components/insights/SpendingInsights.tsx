@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowUp, ArrowDown, TrendingUp, Calendar, Tag, AlertCircle, PiggyBank, TrendingDown } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
+import { supabase } from "@/lib/supabase";
+import { useState, useEffect } from "react";
 
 interface SpendingInsightsProps {
   expenses: any[];
@@ -18,21 +20,40 @@ interface Insight {
 }
 
 export function SpendingInsights({ expenses, monthlyBudget, selectedMonth, selectedYear }: SpendingInsightsProps) {
+  const [insights, setInsights] = useState<Insight[]>([]);
+
+  useEffect(() => {
+    const loadInsights = async () => {
+      const result = await getInsights();
+      setInsights(result.insights);
+    };
+    loadInsights();
+  }, [expenses, monthlyBudget, selectedMonth, selectedYear]);
+
   const getMonthlyExpenses = (month: number, year: number) => {
     return expenses.filter(expense => {
       const expenseDate = new Date(expense.date);
-      return expenseDate.getMonth() === month && 
-             expenseDate.getFullYear() === year;
+      // Create start and end dates for the month
+      const startOfMonth = new Date(year, month, 1);
+      const endOfMonth = new Date(year, month + 1, 0);
+      // Check if the expense date falls within the month
+      return expenseDate >= startOfMonth && expenseDate <= endOfMonth;
     });
   };
 
   const getMonthlySavings = (month: number, year: number) => {
     const monthlyExpenses = getMonthlyExpenses(month, year);
     const totalExpenses = monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
+    
+    // If there are no expenses, return null
+    if (monthlyExpenses.length === 0) {
+      return null;
+    }
+    
     return monthlyBudget - totalExpenses;
   };
 
-  const getInsights = () => {
+  const getInsights = async () => {
     if (selectedMonth === null) return { insights: [] };
 
     // Filter expenses for current month
@@ -40,16 +61,39 @@ export function SpendingInsights({ expenses, monthlyBudget, selectedMonth, selec
     const currentMonthTotal = currentMonthExpenses.reduce((sum, expense) => sum + expense.amount, 0);
     const currentSavings = getMonthlySavings(selectedMonth, selectedYear);
 
-    // Calculate savings for all months
-    const savingsByMonth = Array.from({ length: 12 }, (_, i) => ({
-      month: i,
-      year: selectedYear,
-      savings: getMonthlySavings(i, selectedYear)
-    }));
+    // Get current date
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
 
+    // Calculate savings for all months up to current month
+    const savingsByMonth = [];
+    const startMonth = 0; // January
+    const endMonth = selectedYear === currentYear ? currentMonth : 11; // December or current month
+    
+    for (let month = startMonth; month <= endMonth; month++) {
+      const monthlyExpenses = getMonthlyExpenses(month, selectedYear);
+      const totalExpenses = monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
+      const savings = monthlyBudget - totalExpenses;
+      
+      // Include all months that have either expenses or are the current month
+      if (monthlyExpenses.length > 0 || month === currentMonth) {
+        savingsByMonth.push({
+          month,
+          year: selectedYear,
+          savings
+        });
+      }
+    }
+
+    if (savingsByMonth.length === 0) return { insights: [] };
+
+    // Find the month with the highest savings
     const maxSavingsMonth = savingsByMonth.reduce((max, current) => 
       current.savings > max.savings ? current : max
     );
+
+    // Find the month with the lowest savings (biggest negative value)
     const minSavingsMonth = savingsByMonth.reduce((min, current) => 
       current.savings < min.savings ? current : min
     );
@@ -89,11 +133,105 @@ export function SpendingInsights({ expenses, monthlyBudget, selectedMonth, selec
     const newCategories = Array.from(currentMonthCategories)
       .filter(category => !allCategories.has(category));
 
-    // Calculate forecast
-    const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
-    const currentDay = new Date().getDate();
-    const dailyAverage = currentMonthTotal / currentDay;
-    const forecastTotal = dailyAverage * daysInMonth;
+    // Calculate weighted day-type forecasting
+    const calculateDayTypeAverages = () => {
+      // Get expenses from last 3 months for better averages
+      const lastThreeMonthsExpenses = expenses.filter(expense => {
+        const expenseDate = new Date(expense.date);
+        const monthDiff = (selectedYear - expenseDate.getFullYear()) * 12 + 
+                         (selectedMonth - expenseDate.getMonth());
+        return monthDiff >= 0 && monthDiff < 3;
+      });
+
+      // Calculate weekday and weekend averages
+      const weekdayExpenses: number[] = [];
+      const weekendExpenses: number[] = [];
+
+      lastThreeMonthsExpenses.forEach(expense => {
+        const expenseDate = new Date(expense.date);
+        const dayOfWeek = expenseDate.getDay();
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+        
+        if (isWeekend) {
+          weekendExpenses.push(expense.amount);
+        } else {
+          weekdayExpenses.push(expense.amount);
+        }
+      });
+
+      const weekdayAverage = weekdayExpenses.length > 0 
+        ? weekdayExpenses.reduce((sum, amount) => sum + amount, 0) / weekdayExpenses.length 
+        : 0;
+      
+      const weekendAverage = weekendExpenses.length > 0 
+        ? weekendExpenses.reduce((sum, amount) => sum + amount, 0) / weekendExpenses.length 
+        : 0;
+
+      return { weekdayAverage, weekendAverage };
+    };
+
+    // Calculate remaining days in the month
+    const getRemainingDays = () => {
+      const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+      const currentDay = currentDate.getDate();
+      const remainingDays = daysInMonth - currentDay;
+      
+      let remainingWeekdays = 0;
+      let remainingWeekends = 0;
+      
+      for (let i = 1; i <= remainingDays; i++) {
+        const nextDate = new Date(selectedYear, selectedMonth, currentDay + i);
+        const dayOfWeek = nextDate.getDay();
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+          remainingWeekends++;
+        } else {
+          remainingWeekdays++;
+        }
+      }
+      
+      return { remainingWeekdays, remainingWeekends };
+    };
+
+    // Get known upcoming expenses
+    const getKnownUpcomingExpenses = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return 0;
+
+        // Get the current date and end of month
+        const currentDate = new Date();
+        const endOfMonth = new Date(selectedYear, selectedMonth + 1, 0);
+        
+        // Fetch recurring expenses
+        const { data: recurringExpenses, error } = await supabase
+          .from('expenses')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_recurring', true)
+          .gte('date', currentDate.toISOString())
+          .lte('date', endOfMonth.toISOString());
+
+        if (error) throw error;
+
+        // Calculate total upcoming expenses
+        const totalUpcoming = recurringExpenses?.reduce((sum, expense) => sum + expense.amount, 0) || 0;
+        return totalUpcoming;
+      } catch (error) {
+        console.error('Error fetching upcoming expenses:', error);
+        return 0;
+      }
+    };
+
+    // Calculate the forecast
+    const { weekdayAverage, weekendAverage } = calculateDayTypeAverages();
+    const { remainingWeekdays, remainingWeekends } = getRemainingDays();
+    const knownUpcomingExpenses = await getKnownUpcomingExpenses();
+
+    const dailyForecast = (weekdayAverage * remainingWeekdays) + (weekendAverage * remainingWeekends);
+    const forecastTotal = currentMonthTotal + dailyForecast + knownUpcomingExpenses;
+
+    // Calculate if we have enough data for reliable forecast
+    const hasEnoughData = lastThreeMonthsExpenses.length >= 3;
 
     const insights: Insight[] = [];
 
@@ -144,11 +282,12 @@ export function SpendingInsights({ expenses, monthlyBudget, selectedMonth, selec
       });
     }
 
+    // Add forecast insight
     insights.push({
       type: 'forecast',
-      icon: <Calendar className="h-5 w-5 text-dragonfly-600" />,
+      icon: <TrendingUp className="h-5 w-5 text-blue-500" />,
       title: 'תחזית סוף חודש',
-      message: `לפי הקצב הנוכחי, ההוצאות החודשיות צפויות להגיע ל-₪${forecastTotal.toLocaleString()}`
+      message: `לפי הקצב הנוכחי, ההוצאות החודשיות צפויות להגיע ל-₪${Math.round(forecastTotal).toLocaleString()}\n⚠️ לתחזית אמינה יותר, מומלץ להזין לפחות 3 חודשים של הוצאות`
     });
 
     insights.push({
@@ -160,8 +299,6 @@ export function SpendingInsights({ expenses, monthlyBudget, selectedMonth, selec
 
     return { insights };
   };
-
-  const { insights } = getInsights();
 
   return (
     <Card>

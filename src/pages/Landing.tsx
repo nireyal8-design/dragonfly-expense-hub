@@ -12,17 +12,6 @@ export default function Landing() {
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
         <div className="container flex h-16 items-center justify-between">
           <Logo size="medium" />
-          <nav className="hidden gap-6 md:flex">
-            <Link to="/" className="text-sm font-medium hover:text-dragonfly-600 transition-colors">
-              דף הבית
-            </Link>
-            <Link to="#features" className="text-sm font-medium hover:text-dragonfly-600 transition-colors">
-              תכונות
-            </Link>
-            <Link to="#pricing" className="text-sm font-medium hover:text-dragonfly-600 transition-colors">
-              מחירים
-            </Link>
-          </nav>
           <div className="flex items-center gap-2">
             <Link to="/login">
               <Button variant="outline" size="sm">התחברות</Button>
@@ -127,9 +116,9 @@ export default function Landing() {
         {/* CTA Section */}
         <section className="bg-dragonfly-600 text-white py-16">
           <div className="container text-center">
-            <h2 className="text-3xl font-bold mb-4">מוכן לקחת שליטה על הפיננסים שלך?</h2>
+            <h2 className="text-3xl font-bold mb-4">כל ההוצאות שלך, במקום אחד – פשוט. ברור. בשליטה.</h2>
             <p className="text-dragonfly-100 mb-8 max-w-2xl mx-auto">
-              הצטרף לאלפי משתמשים ששינו את ניהול הפיננסים שלהם עם SpendWise.
+              הצטרף לאלפי משתמשים ששינו את הניהול הפיננסי שלהם עם SpendWise.
             </p>
             <Link to="/register">
               <Button size="lg" variant="secondary" className="bg-white text-dragonfly-700 hover:bg-gray-100">

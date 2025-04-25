@@ -220,8 +220,20 @@ export function AdvancedSettings() {
 
       if (expensesError) throw expensesError;
 
+      // Filter out recurring expenses that are outside the date range
+      const filteredExpenses = expenses.filter(expense => {
+        if (!expense.is_recurring) return true;
+        
+        const expenseDate = new Date(expense.date);
+        const fromDate = new Date(dateRange.from);
+        const toDate = new Date(dateRange.to);
+        
+        // For recurring expenses, only include them if their date falls within the range
+        return expenseDate >= fromDate && expenseDate <= toDate;
+      });
+
       // Cast the expenses data to the Expense type
-      const typedExpenses = expenses as Expense[];
+      const typedExpenses = filteredExpenses as Expense[];
 
       if (exportFormat === "csv") {
         // Add BOM for UTF-8 encoding
@@ -432,7 +444,7 @@ export function AdvancedSettings() {
 
         // Group expenses by month
         const expensesByMonth = typedExpenses.reduce((acc, expense) => {
-          const date = new Date(expense.transaction_date || expense.date);
+          const date = new Date(expense.date);
           const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
           if (!acc[monthKey]) {
             acc[monthKey] = [];
@@ -479,7 +491,7 @@ export function AdvancedSettings() {
 
           // Add expenses for this month
           expensesByMonth[monthKey].forEach(expense => {
-            const date = new Date(expense.transaction_date || expense.date).toLocaleDateString('he-IL');
+            const date = new Date(expense.date).toLocaleDateString('he-IL');
             const amount = new Intl.NumberFormat('he-IL', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2
@@ -661,8 +673,20 @@ export function AdvancedSettings() {
 
       if (expensesError) throw expensesError;
 
+      // Filter out recurring expenses that are outside the date range
+      const filteredExpenses = expenses.filter(expense => {
+        if (!expense.is_recurring) return true;
+        
+        const expenseDate = new Date(expense.date);
+        const fromDate = new Date(dateRange.from);
+        const toDate = new Date(dateRange.to);
+        
+        // For recurring expenses, only include them if their date falls within the range
+        return expenseDate >= fromDate && expenseDate <= toDate;
+      });
+
       // Cast the expenses data to the Expense type
-      const typedExpenses = expenses as Expense[];
+      const typedExpenses = filteredExpenses as Expense[];
 
       // Create a temporary div to hold our HTML content
       const tempDiv = document.createElement('div');
@@ -787,7 +811,7 @@ export function AdvancedSettings() {
 
           typedExpenses.forEach(expense => {
             // Format the date to show the actual transaction date
-            const date = new Date(expense.transaction_date || expense.date).toLocaleDateString('he-IL', {
+            const date = new Date(expense.date).toLocaleDateString('he-IL', {
               year: 'numeric',
               month: '2-digit',
               day: '2-digit',
@@ -831,8 +855,12 @@ export function AdvancedSettings() {
             return acc;
           }, {});
 
+          // Sort categories by total amount in descending order
+          const sortedCategories = Object.entries(categoryTotals)
+            .sort(([, a], [, b]) => b - a);
+
           htmlContent += `<div class="category-summary">`;
-          Object.entries(categoryTotals).forEach(([category, total]) => {
+          sortedCategories.forEach(([category, total]) => {
             const formattedTotal = new Intl.NumberFormat('he-IL', {
               style: 'currency',
               currency: 'ILS'

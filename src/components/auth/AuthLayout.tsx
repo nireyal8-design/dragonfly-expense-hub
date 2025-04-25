@@ -1,4 +1,3 @@
-
 import { ReactNode } from "react";
 import { Logo } from "@/components/Logo";
 import { Link } from "react-router-dom";
@@ -24,9 +23,9 @@ export function AuthLayout({ children, title, description, footer, hebrewContent
         <div className="relative z-20 mt-auto space-y-4" dir="rtl">
           {hebrewContent || (
             <>
-              <h1 className="text-4xl font-bold">Dragonfly Expense Hub</h1>
+              <h1 className="text-4xl font-bold">SpendWise</h1>
               <p className="text-lg text-dragonfly-100">
-                Simplify your finances, track expenses effortlessly, and gain valuable insights. Join thousands of users who have transformed their financial management with Dragonfly.
+                פשט את ניהול הכספים שלך, עקוב אחר הוצאות בקלות, וקבל תובנות בעלות ערך. הצטרף לאלפי משתמשים ששינו את ניהול הכספים שלהם עם SpendWise.
               </p>
             </>
           )}

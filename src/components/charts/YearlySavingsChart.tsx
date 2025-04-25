@@ -127,71 +127,105 @@ export function YearlySavingsChart({ expenses, monthlyBudget, selectedMonth }: Y
   };
 
   return (
-    <Card className="border-none shadow-lg">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <PiggyBank className="h-5 w-5 text-primary" />
-          חיסכון חודשי
+    <Card className="border-none shadow-xl bg-gradient-to-br from-background to-muted/20">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-3 text-xl font-semibold">
+          <PiggyBank className="h-6 w-6 text-primary" />
+          חיסכון שנתי {selectedMonth.getFullYear()}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-4">
-          <div className="w-2/3">
-            <ResponsiveContainer width="100%" height={150}>
-              <BarChart 
-                data={data} 
-                margin={{ left: 40, right: 20, top: 10, bottom: 10 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis 
-                  dataKey="month" 
-                  tick={{ fill: 'hsl(var(--foreground))', fontSize: 11 }}
-                  axisLine={{ stroke: 'hsl(var(--border))' }}
-                  tickLine={{ stroke: 'hsl(var(--border))' }}
-                  padding={{ left: 15, right: 15 }}
-                />
-                <YAxis 
-                  tick={{ fill: 'hsl(var(--foreground))', fontSize: 11 }}
-                  axisLine={{ stroke: 'hsl(var(--border))' }}
-                  tickLine={{ stroke: 'hsl(var(--border))' }}
-                  tickFormatter={(value) => `₪${Math.abs(value).toLocaleString()}`}
-                  width={70}
-                  domain={domain}
-                />
-                <ReferenceLine y={0} stroke="hsl(var(--border))" strokeWidth={1.5} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar
-                  dataKey="savings"
-                  fill="hsl(var(--primary))"
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={20}
-                  data={data}
-                  shape={(props) => {
-                    const { x, y, width, height, savings } = props;
-                    const isNegative = savings < 0;
-                    return (
-                      <rect
-                        x={x}
-                        y={isNegative ? y + height : y}
-                        width={width}
-                        height={Math.abs(height)}
-                        fill={isNegative ? '#ef4444' : '#22c55e'}
-                        className="cursor-pointer transition-opacity hover:opacity-80"
-                      />
-                    );
-                  }}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+      <CardContent className="space-y-6">
+        <div className="w-full">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart 
+              data={data} 
+              margin={{ left: 50, right: 30, top: 20, bottom: 20 }}
+            >
+              <defs>
+                <linearGradient id="positiveGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#22c55e" stopOpacity={0.8}/>
+                  <stop offset="100%" stopColor="#22c55e" stopOpacity={0.4}/>
+                </linearGradient>
+                <linearGradient id="negativeGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.8}/>
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0.4}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke="hsl(var(--border))" 
+                opacity={0.2} 
+                vertical={false}
+              />
+              <XAxis 
+                dataKey="month" 
+                tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }}
+                axisLine={{ stroke: 'hsl(var(--border))' }}
+                tickLine={{ stroke: 'hsl(var(--border))' }}
+                padding={{ left: 20, right: 20 }}
+              />
+              <YAxis 
+                tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }}
+                axisLine={{ stroke: 'hsl(var(--border))' }}
+                tickLine={{ stroke: 'hsl(var(--border))' }}
+                tickFormatter={(value) => `₪${Math.abs(value).toLocaleString()}`}
+                width={80}
+                domain={domain}
+                label={{ 
+                  value: 'חיסכון בש״ח', 
+                  angle: -90, 
+                  position: 'insideLeft',
+                  offset: -35,
+                  style: { 
+                    fill: 'hsl(var(--foreground))',
+                    fontSize: 12
+                  }
+                }}
+              />
+              <ReferenceLine 
+                y={0} 
+                stroke="hsl(var(--border))" 
+                strokeWidth={2}
+                strokeOpacity={0.8}
+              />
+              <Tooltip 
+                content={<CustomTooltip />}
+                cursor={{ fill: 'hsl(var(--muted))', opacity: 0.1 }}
+              />
+              <Bar
+                dataKey="savings"
+                radius={[6, 6, 0, 0]}
+                maxBarSize={50}
+                data={data}
+                shape={(props) => {
+                  const { x, y, width, height, savings } = props;
+                  const isNegative = savings < 0;
+                  return (
+                    <rect
+                      x={x}
+                      y={isNegative ? y + height : y}
+                      width={width}
+                      height={Math.abs(height)}
+                      fill={`url(#${isNegative ? 'negativeGradient' : 'positiveGradient'})`}
+                      className="cursor-pointer transition-all duration-200 hover:opacity-90"
+                      rx={6}
+                      ry={6}
+                    />
+                  );
+                }}
+              />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
 
-        <div className="flex items-center p-4 bg-muted/50 rounded-lg border">
-          <div className="flex items-center gap-2">
-            <PiggyBank className={`h-5 w-5 ${isPositiveSavings ? 'text-green-500' : 'text-red-500'}`} />
+        <div className="flex items-center p-5 bg-muted/30 rounded-xl border backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            <div className={`p-2.5 rounded-full ${isPositiveSavings ? 'bg-green-100' : 'bg-red-100'}`}>
+              <PiggyBank className={`h-6 w-6 ${isPositiveSavings ? 'text-green-600' : 'text-red-600'}`} />
+            </div>
             <div>
-              <p className="text-sm text-muted-foreground">חיסכון שנתי</p>
-              <p className={`text-lg font-bold ${isPositiveSavings ? 'text-green-500' : 'text-red-500'}`}>
+              <p className="text-sm font-medium text-muted-foreground">סה״כ חיסכון שנתי</p>
+              <p className={`text-2xl font-bold ${isPositiveSavings ? 'text-green-600' : 'text-red-600'}`}>
                 ₪{Math.abs(totalYearlySavings).toLocaleString()}
               </p>
             </div>

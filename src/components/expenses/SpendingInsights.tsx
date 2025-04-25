@@ -7,6 +7,7 @@ interface SpendingInsightsProps {
   selectedMonth: number | null;
   selectedYear: number;
   monthlyBudget?: number;
+  monthlyBudgets?: { [key: string]: number };
 }
 
 interface CategoryChange {
@@ -16,7 +17,7 @@ interface CategoryChange {
   previousAmount: number;
 }
 
-export function SpendingInsights({ expenses, selectedMonth, selectedYear, monthlyBudget }: SpendingInsightsProps) {
+export function SpendingInsights({ expenses, selectedMonth, selectedYear, monthlyBudget, monthlyBudgets = {} }: SpendingInsightsProps) {
   const getMonthlyExpenses = (month: number, year: number) => {
     return expenses.filter(expense => {
       const date = new Date(expense.date);
@@ -106,7 +107,18 @@ export function SpendingInsights({ expenses, selectedMonth, selectedYear, monthl
   const getMonthlySavings = (month: number, year: number) => {
     const monthlyExpenses = getMonthlyExpenses(month, year);
     const totalExpenses = monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
-    return monthlyBudget ? monthlyBudget - totalExpenses : 0;
+    
+    // If there are no expenses, return null
+    if (monthlyExpenses.length === 0) {
+      return null;
+    }
+    
+    // If there's no budget or no expenses, return null
+    if (!monthlyBudget || totalExpenses === 0) {
+      return null;
+    }
+    
+    return monthlyBudget - totalExpenses;
   };
 
   const getSavingsInsights = () => {
@@ -116,12 +128,24 @@ export function SpendingInsights({ expenses, selectedMonth, selectedYear, monthl
     const savingsByMonth = Array.from({ length: 12 }, (_, i) => {
       const month = i;
       const year = selectedYear;
-      return {
-        month,
-        year,
-        savings: getMonthlySavings(month, year)
-      };
-    });
+      const monthlyExpenses = getMonthlyExpenses(month, year);
+      const totalExpenses = monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
+      
+      // Only include months that have actual expenses
+      if (monthlyExpenses.length > 0 && totalExpenses > 0) {
+        const savings = getMonthlySavings(month, year);
+        if (savings !== null) {
+          return {
+            month,
+            year,
+            savings
+          };
+        }
+      }
+      return null;
+    }).filter(Boolean);
+
+    if (savingsByMonth.length === 0) return [];
 
     const maxSavingsMonth = savingsByMonth.reduce((max, current) => 
       current.savings > max.savings ? current : max

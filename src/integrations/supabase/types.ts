@@ -57,6 +57,39 @@ export type Database = {
         }
         Relationships: []
       }
+      goals: {
+        Row: {
+          id: string
+          created_at: string
+          name: string
+          target_amount: number
+          allocation_percentage: number
+          deadline: string | null
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          name: string
+          target_amount: number
+          allocation_percentage: number
+          deadline?: string | null
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          name?: string
+          target_amount?: number
+          allocation_percentage?: number
+          deadline?: string | null
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       users: {
         Row: {
           budget: number

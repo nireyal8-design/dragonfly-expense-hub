@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { CreditCardImport } from '@/components/expenses/CreditCardImport';
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
+import { Goals } from "@/components/settings/Goals";
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -74,7 +75,7 @@ export default function Settings() {
           <div className="flex flex-col gap-4">
             <div className="flex justify-between items-center">
               <h1 className="text-2xl font-bold">שלום, {userName}</h1>
-              <Logo size="medium" />
+              <Logo size="large" />
             </div>
           </div>
         </div>
@@ -95,33 +96,50 @@ export default function Settings() {
         </div>
 
         <Tabs defaultValue="profile" dir="rtl">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
+            {/* User Profile & Basic Settings */}
             <TabsTrigger value="profile">פרופיל</TabsTrigger>
+            <TabsTrigger value="advanced">דוחות</TabsTrigger>
+            
+            {/* Financial Management */}
+            <TabsTrigger value="goals">קביעת מטרות ויעדים</TabsTrigger>
             <TabsTrigger value="recurring">הוצאות חוזרות</TabsTrigger>
-            <TabsTrigger value="notifications">התראות</TabsTrigger>
             <TabsTrigger value="credit-card">טעינת הוצאות מכרטיס אשראי</TabsTrigger>
-            <TabsTrigger value="advanced">הגדרות מתקדמות</TabsTrigger>
+            
+            {/* System & Support */}
+            <TabsTrigger value="notifications">התראות</TabsTrigger>
             <TabsTrigger value="help">עזרה ותמיכה</TabsTrigger>
           </TabsList>
+          
+          {/* User Profile & Basic Settings */}
           <TabsContent value="profile">
             <ProfileSettings />
-          </TabsContent>
-          <TabsContent value="recurring">
-            <RecurringExpensesSettings />
-          </TabsContent>
-          <TabsContent value="notifications">
-            <NotificationSettings />
           </TabsContent>
           <TabsContent value="advanced">
             <AdvancedSettings />
           </TabsContent>
-          <TabsContent value="help">
-            <HelpSupport />
+          
+          {/* Financial Management */}
+          <TabsContent value="goals">
+            <div className="space-y-6">
+              <Goals />
+            </div>
+          </TabsContent>
+          <TabsContent value="recurring">
+            <RecurringExpensesSettings />
           </TabsContent>
           <TabsContent value="credit-card">
             <div className="space-y-6">
               <CreditCardImport />
             </div>
+          </TabsContent>
+          
+          {/* System & Support */}
+          <TabsContent value="notifications">
+            <NotificationSettings />
+          </TabsContent>
+          <TabsContent value="help">
+            <HelpSupport />
           </TabsContent>
         </Tabs>
       </div>

@@ -60,7 +60,6 @@ export function RecurringExpensesSettings() {
         if (!uniqueExpenses.has(key)) {
           uniqueExpenses.set(key, {
             ...expense,
-            is_active: true,
             date: expense.date || new Date().toISOString(),
             payment_method: (expense.payment_method as PaymentMethod) || 'cash'
           });
@@ -77,32 +76,10 @@ export function RecurringExpensesSettings() {
     }
   };
 
-  const handleToggleActive = async (expense: RecurringExpense) => {
-    try {
-      const { error } = await supabase
-        .from('expenses')
-        .update({ is_recurring: !expense.is_active })
-        .eq('id', expense.id);
-
-      if (error) throw error;
-
-      setRecurringExpenses(prev => 
-        prev.map(e => e.id === expense.id 
-          ? { ...e, is_active: !e.is_active } 
-          : e
-        )
-      );
-
-      toast.success(`הוצאה חוזרת ${!expense.is_active ? 'הופעלה' : 'הושבתה'} בהצלחה`);
-    } catch (error) {
-      console.error('Error updating recurring expense:', error);
-      toast.error('שגיאה בעדכון ההוצאה החוזרת');
-    }
-  };
-
   const handleUpdateExpense = async (expense: RecurringExpense) => {
     try {
-      const { error } = await supabase
+      // First, update the current expense
+      const { error: updateError } = await supabase
         .from('expenses')
         .update({
           name: expense.name,
@@ -114,7 +91,91 @@ export function RecurringExpensesSettings() {
         })
         .eq('id', expense.id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
+
+      // Delete all future occurrences of this expense
+      const { error: deleteError } = await supabase
+        .from('expenses')
+        .delete()
+        .eq('name', expense.name)
+        .eq('user_id', expense.user_id)
+        .eq('is_recurring', true)
+        .gt('date', expense.date);
+
+      if (deleteError) throw deleteError;
+
+      // Create new future expenses based on the new frequency
+      const futureExpenses = [];
+      const currentDate = new Date(expense.date);
+      const endOfYear = new Date(currentDate.getFullYear(), 11, 31); // December 31st of current year
+      let nextDate = new Date(currentDate);
+      
+      // Adjust for timezone offset
+      nextDate.setHours(12, 0, 0, 0); // Set to noon to avoid timezone issues
+      
+      while (nextDate <= endOfYear) {
+        // Skip the current expense date
+        if (nextDate.getTime() !== currentDate.getTime()) {
+          futureExpenses.push({
+            name: expense.name,
+            amount: expense.amount,
+            user_id: expense.user_id,
+            date: nextDate.toISOString(),
+            transaction_date: nextDate.toISOString(),
+            is_recurring: true,
+            recurring_day: expense.recurring_day,
+            recurring_frequency: expense.recurring_frequency,
+            category: expense.category,
+            currency: expense.currency,
+            payment_method: expense.payment_method,
+            notes: expense.notes
+          });
+        }
+        
+        // Calculate next date based on frequency
+        switch (expense.recurring_frequency) {
+          case 'monthly':
+            nextDate = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, expense.recurring_day);
+            break;
+          case 'bimonthly':
+            nextDate = new Date(nextDate.getFullYear(), nextDate.getMonth() + 2, expense.recurring_day);
+            break;
+          case 'quarterly':
+            nextDate = new Date(nextDate.getFullYear(), nextDate.getMonth() + 3, expense.recurring_day);
+            break;
+          case 'yearly':
+            nextDate = new Date(nextDate.getFullYear() + 1, nextDate.getMonth(), expense.recurring_day);
+            break;
+        }
+        // Set to noon for each new date to avoid timezone issues
+        nextDate.setHours(12, 0, 0, 0);
+      }
+
+      // Insert all new future expenses
+      if (futureExpenses.length > 0) {
+        const { error: insertError } = await supabase
+          .from('expenses')
+          .insert(futureExpenses);
+        
+        if (insertError) throw insertError;
+      }
+
+      // Update the recurring expense template
+      const { error: recurringError } = await supabase
+        .from('recurring_expenses')
+        .upsert([
+          {
+            user_id: expense.user_id,
+            name: expense.name,
+            amount: expense.amount,
+            category: expense.category,
+            currency: expense.currency,
+            recurring_day: expense.recurring_day,
+            recurring_frequency: expense.recurring_frequency,
+          }
+        ]);
+      
+      if (recurringError) throw recurringError;
 
       setRecurringExpenses(prev => 
         prev.map(e => e.id === expense.id ? expense : e)
@@ -129,47 +190,41 @@ export function RecurringExpensesSettings() {
     }
   };
 
-  const handleDeleteExpense = async (id: string) => {
+  const handleDeleteExpense = async (expense: RecurringExpense) => {
     try {
-      const { error } = await supabase
+      // Delete all future occurrences of this expense
+      const { error: deleteError } = await supabase
+        .from('expenses')
+        .delete()
+        .eq('name', expense.name)
+        .eq('user_id', expense.user_id)
+        .eq('is_recurring', true)
+        .gt('date', expense.date);
+
+      if (deleteError) throw deleteError;
+
+      // Update the current expense to mark it as non-recurring
+      const { error: updateError } = await supabase
         .from('expenses')
         .update({ is_recurring: false })
-        .eq('id', id);
+        .eq('id', expense.id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
-      setRecurringExpenses(prev => prev.filter(e => e.id !== id));
+      // Delete the recurring expense template
+      const { error: deleteTemplateError } = await supabase
+        .from('recurring_expenses')
+        .delete()
+        .eq('name', expense.name)
+        .eq('user_id', expense.user_id);
+
+      if (deleteTemplateError) throw deleteTemplateError;
+
+      setRecurringExpenses(prev => prev.filter(e => e.id !== expense.id));
       toast.success('ההוצאה החוזרת נמחקה בהצלחה');
     } catch (error) {
       console.error('Error deleting recurring expense:', error);
       toast.error('שגיאה במחיקת ההוצאה החוזרת');
-    }
-  };
-
-  const handleSave = async () => {
-    if (!editingExpense) return;
-
-    try {
-      const { error } = await supabase
-        .from('expenses')
-        .update({
-          name: editingExpense.name,
-          amount: editingExpense.amount,
-          category: editingExpense.category,
-          currency: editingExpense.currency,
-          recurring_day: editingExpense.recurring_day,
-          recurring_frequency: editingExpense.recurring_frequency
-        })
-        .eq('id', editingExpense.id);
-
-      if (error) throw error;
-
-      setRecurringExpenses(prev => 
-        prev.map(e => e.id === editingExpense.id ? editingExpense : e)
-      );
-      setIsDialogOpen(false);
-    } catch (error) {
-      console.error('Error updating expense:', error);
     }
   };
 
@@ -226,10 +281,6 @@ export function RecurringExpensesSettings() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Switch
-                      checked={expense.is_active}
-                      onCheckedChange={() => handleToggleActive(expense)}
-                    />
                     <Button
                       variant="ghost"
                       size="icon"
@@ -243,7 +294,7 @@ export function RecurringExpensesSettings() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => handleDeleteExpense(expense.id)}
+                      onClick={() => handleDeleteExpense(expense)}
                     >
                       <Trash className="h-4 w-4" />
                     </Button>
@@ -266,9 +317,8 @@ export function RecurringExpensesSettings() {
                 <label className="text-sm font-medium">שם</label>
                 <Input
                   value={editingExpense.name}
-                  onChange={(e) =>
-                    setEditingExpense({ ...editingExpense, name: e.target.value })
-                  }
+                  disabled
+                  className="bg-muted"
                 />
               </div>
               <div>
@@ -276,36 +326,24 @@ export function RecurringExpensesSettings() {
                 <Input
                   type="number"
                   value={editingExpense.amount}
-                  onChange={(e) =>
-                    setEditingExpense({
-                      ...editingExpense,
-                      amount: parseFloat(e.target.value),
-                    })
-                  }
+                  disabled
+                  className="bg-muted"
                 />
               </div>
               <div>
                 <label className="text-sm font-medium">קטגוריה</label>
                 <Input
                   value={editingExpense.category || ''}
-                  onChange={(e) =>
-                    setEditingExpense({
-                      ...editingExpense,
-                      category: e.target.value || null,
-                    })
-                  }
+                  disabled
+                  className="bg-muted"
                 />
               </div>
               <div>
                 <label className="text-sm font-medium">מטבע</label>
                 <Input
                   value={editingExpense.currency || ''}
-                  onChange={(e) =>
-                    setEditingExpense({
-                      ...editingExpense,
-                      currency: e.target.value || null,
-                    })
-                  }
+                  disabled
+                  className="bg-muted"
                 />
               </div>
               <div>
