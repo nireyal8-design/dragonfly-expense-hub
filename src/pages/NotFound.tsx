@@ -1,9 +1,17 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function NotFound() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    console.log('404 - Not Found page rendered');
+    console.log('Current path:', location.pathname);
+    console.log('Previous path:', document.referrer);
+  }, [location]);
 
   return (
     <div className="container mx-auto py-8">
@@ -13,7 +21,10 @@ export default function NotFound() {
           The page you are looking for does not exist.
         </p>
         <Button
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            console.log('Navigating back...');
+            navigate(-1);
+          }}
           className="flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />

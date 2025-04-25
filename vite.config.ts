@@ -22,8 +22,7 @@ export default defineConfig(({ command, mode }) => ({
   },
   plugins: [
     react({
-      jsxImportSource: 'react',
-      jsxRuntime: 'automatic'
+      jsxImportSource: 'react'
     }),
     command === 'serve' &&
     componentTagger(),
