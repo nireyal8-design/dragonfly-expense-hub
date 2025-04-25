@@ -8,6 +8,12 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
+// Get the current URL and construct the callback URL
+const getCallbackUrl = () => {
+  const url = new URL(window.location.href);
+  return `${url.origin}/dragonfly-expense-hub/auth/callback`;
+};
+
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: true,
@@ -18,9 +24,19 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   }
 });
 
-// Set the redirect URL after client creation
-supabase.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_IN') {
-    window.location.href = `${window.location.origin}/dragonfly-expense-hub/auth/callback`;
+// Export a function to handle Google login with the correct redirect URL
+export const signInWithGoogle = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: getCallbackUrl()
+    }
+  });
+  
+  if (error) {
+    console.error('Error signing in with Google:', error);
+    throw error;
   }
-});
+  
+  return data;
+};

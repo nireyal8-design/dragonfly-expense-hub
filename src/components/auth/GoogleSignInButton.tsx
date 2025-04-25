@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { signInWithGoogle } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
@@ -33,40 +33,16 @@ export function GoogleSignInButton() {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
+      console.log('Starting Google sign-in...');
       
-      // Generate PKCE values
-      const { codeVerifier, codeChallenge } = await generatePKCE();
+      const result = await signInWithGoogle();
       
-      // Store code verifier in session storage
-      sessionStorage.setItem('code_verifier', codeVerifier);
+      if (!result.url) {
+        throw new Error('Failed to get Google sign-in URL');
+      }
       
-      // Get the current URL and port
-      const currentUrl = new URL(window.location.href);
-      const isLocalhost = currentUrl.hostname === 'localhost' || currentUrl.hostname === '127.0.0.1';
-      const port = currentUrl.port || '8086'; // Default to port 8086 if not specified
-      
-      // Set the redirect URL based on environment
-      const redirectUrl = isLocalhost 
-        ? `${currentUrl.protocol}//${currentUrl.hostname}:${port}/auth/callback`
-        : `${currentUrl.protocol}//${currentUrl.host}/auth/callback`;
-
-      console.log('Redirecting to:', redirectUrl);
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-            code_challenge: codeChallenge,
-            code_challenge_method: 'S256'
-          },
-          redirectTo: redirectUrl,
-          skipBrowserRedirect: false
-        }
-      });
-
-      if (error) throw error;
+      console.log('Google sign-in URL:', result.url);
+      window.location.href = result.url;
     } catch (error: any) {
       console.error('Error signing in with Google:', error);
       toast.error('שגיאה בהתחברות עם Google');
@@ -88,7 +64,7 @@ export function GoogleSignInButton() {
       ) : (
         <>
           <FcGoogle className="ml-2 h-5 w-5" />
-          המשך עם Google
+          <span>המשך עם Google</span>
         </>
       )}
     </Button>
