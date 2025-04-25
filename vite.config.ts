@@ -59,11 +59,7 @@ export default defineConfig(({ command, mode }) => ({
         format: 'es',
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
-        }
+        assetFileNames: 'assets/[name]-[hash].[ext]'
       }
     },
     assetsInclude: ['**/*.png', '**/*.ico', '**/*.webmanifest'],
