@@ -16,5 +16,22 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/auth/callback",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Language",
+          "value": "he"
+        }
+      ]
+    }
   ]
 } 
