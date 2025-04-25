@@ -19,21 +19,31 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
+        console.log('Starting auth callback handling...');
         const code = searchParams.get('code');
         const codeVerifier = sessionStorage.getItem('code_verifier');
         
-        console.log('Auth callback received:', { code, codeVerifier: !!codeVerifier });
+        console.log('Auth callback parameters:', { 
+          code: code ? 'present' : 'missing', 
+          codeVerifier: codeVerifier ? 'present' : 'missing',
+          searchParams: Object.fromEntries(searchParams.entries())
+        });
         
         if (!code || !codeVerifier) {
-          console.error('Missing code or code_verifier');
+          console.error('Missing required parameters:', { code, codeVerifier });
           setError('Authentication failed: Missing required parameters');
           return;
         }
 
         // Get the session from Supabase
+        console.log('Attempting to get session from Supabase...');
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        console.log('Session check result:', { session: !!session, error: sessionError });
+        console.log('Session check result:', { 
+          hasSession: !!session,
+          sessionError: sessionError?.message,
+          sessionUser: session?.user
+        });
         
         if (sessionError) {
           console.error('Session error:', sessionError);
@@ -43,6 +53,11 @@ export default function AuthCallback() {
 
         if (session) {
           console.log('Session found, setting user and navigating to dashboard');
+          console.log('User details:', {
+            id: session.user.id,
+            email: session.user.email,
+            role: session.user.role
+          });
           setUser(session.user);
           navigate('/dashboard');
         } else {
@@ -61,6 +76,7 @@ export default function AuthCallback() {
   }, [searchParams, navigate, setUser]);
 
   if (isLoading) {
+    console.log('Rendering loading state...');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -69,6 +85,7 @@ export default function AuthCallback() {
   }
 
   if (error) {
+    console.error('Rendering error state:', error);
     toast({
       variant: "destructive",
       title: "Authentication Error",

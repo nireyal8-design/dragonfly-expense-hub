@@ -11,8 +11,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
+  const handleSetUser = (newUser: User | null) => {
+    console.log('AuthContext: User state changing', {
+      from: user ? { id: user.id, email: user.email } : null,
+      to: newUser ? { id: newUser.id, email: newUser.email } : null
+    });
+    setUser(newUser);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser: handleSetUser }}>
       {children}
     </AuthContext.Provider>
   );
