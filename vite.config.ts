@@ -95,6 +95,8 @@ export default defineConfig(({ command, mode }) => ({
   },
   define: {
     'process.env.BASE_URL': JSON.stringify('/dragonfly-expense-hub/'),
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+    'process.env.VITE_SUPABASE_URL': JSON.stringify(process.env.VITE_SUPABASE_URL || 'https://mknhgpmymovblhdqzcbl.supabase.co'),
+    'process.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1rbmhncG15bW92YmxoZHF6Y2JsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2NTU5OTIsImV4cCI6MjA2MDIzMTk5Mn0.s1pH2bxSKsFQ_qVFvZ37X0FmnFHJ-MazjLcwv6d6It4')
   }
 }));
