@@ -37,8 +37,9 @@ jobs:
           npm run build
           # Create the dragonfly-expense-hub directory in dist
           mkdir -p dist/dragonfly-expense-hub
-          # Copy all files from dist to the subdirectory
-          cp -r dist/* dist/dragonfly-expense-hub/
+          # Copy all files from dist to the subdirectory, excluding the subdirectory itself
+          find dist -maxdepth 1 -type f -exec cp {} dist/dragonfly-expense-hub/ \;
+          find dist/assets -type f -exec cp {} dist/dragonfly-expense-hub/assets/ \;
           # Copy PWA files to the correct location
           cp -r public/icon-192x192.png dist/dragonfly-expense-hub/
           cp -r public/icon-512x512.png dist/dragonfly-expense-hub/
