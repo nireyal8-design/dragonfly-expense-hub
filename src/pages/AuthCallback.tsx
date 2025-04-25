@@ -21,16 +21,20 @@ export default function AuthCallback() {
       try {
         console.log('Starting auth callback handling...');
         const code = searchParams.get('code');
+        const accessToken = searchParams.get('access_token');
+        const refreshToken = searchParams.get('refresh_token');
         const codeVerifier = sessionStorage.getItem('code_verifier');
         
         console.log('Auth callback parameters:', { 
           code: code ? 'present' : 'missing', 
+          accessToken: accessToken ? 'present' : 'missing',
+          refreshToken: refreshToken ? 'present' : 'missing',
           codeVerifier: codeVerifier ? 'present' : 'missing',
           searchParams: Object.fromEntries(searchParams.entries())
         });
         
-        if (!code || !codeVerifier) {
-          console.error('Missing required parameters:', { code, codeVerifier });
+        if (!code && !accessToken) {
+          console.error('Missing required parameters:', { code, accessToken });
           setError('Authentication failed: Missing required parameters');
           return;
         }

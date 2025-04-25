@@ -85,5 +85,16 @@ export default defineConfig(({ command, mode }) => ({
     esbuildOptions: {
       jsx: 'automatic'
     }
+  },
+  preview: {
+    port: 8085,
+    proxy: {
+      '/auth/callback': {
+        target: 'http://localhost:8085',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/auth\/callback/, '')
+      }
+    }
   }
 }));
