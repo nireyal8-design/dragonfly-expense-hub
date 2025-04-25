@@ -27,7 +27,7 @@ export default defineConfig(({ command, mode }) => ({
     command === 'serve' &&
     componentTagger(),
   ].filter(Boolean),
-  base: '/',
+  base: '/dragonfly-expense-hub/',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
