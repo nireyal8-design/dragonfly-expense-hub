@@ -1,16 +1,24 @@
 import { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export default function AuthCallback() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const location = useLocation();
 
   useEffect(() => {
     const handleCallback = async () => {
       try {
         console.log('Starting auth callback handling...');
+        console.log('Location:', location);
+        console.log('Hash:', location.hash);
+
+        // Parse the hash parameters
+        const hashParams = new URLSearchParams(location.hash.substring(1));
+        console.log('Hash params:', Object.fromEntries(hashParams.entries()));
+
+        // Get the session
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -20,11 +28,27 @@ export default function AuthCallback() {
 
         if (session) {
           console.log('Session found, user authenticated successfully');
+          console.log('User:', session.user);
           toast.success('התחברת בהצלחה!');
           navigate('/dashboard');
         } else {
-          console.error('No session found');
-          throw new Error('לא נמצאה סשן פעילה');
+          // Try to get the session again after a short delay
+          setTimeout(async () => {
+            const { data: { session: retrySession }, error: retryError } = await supabase.auth.getSession();
+            if (retryError) {
+              console.error('Retry session error:', retryError);
+              throw retryError;
+            }
+            if (retrySession) {
+              console.log('Session found on retry, user authenticated successfully');
+              console.log('User:', retrySession.user);
+              toast.success('התחברת בהצלחה!');
+              navigate('/dashboard');
+            } else {
+              console.error('No session found after retry');
+              throw new Error('לא נמצאה סשן פעילה');
+            }
+          }, 1000);
         }
       } catch (error: any) {
         console.error('Error handling auth callback:', error);
@@ -34,7 +58,7 @@ export default function AuthCallback() {
     };
 
     handleCallback();
-  }, [navigate, searchParams]);
+  }, [navigate, location]);
 
   return (
     <div className="flex h-screen w-full items-center justify-center">
