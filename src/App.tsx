@@ -36,7 +36,7 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
+          <BrowserRouter basename="/dragonfly-expense-hub">
             <RouteLogger />
             <Routes>
               <Route path="/" element={<Landing />} />
