@@ -22,7 +22,8 @@ export default defineConfig(({ command, mode }) => ({
   },
   plugins: [
     react({
-      jsxImportSource: 'react'
+      jsxImportSource: 'react',
+      jsxRuntime: 'automatic'
     }),
     command === 'serve' &&
     componentTagger(),
@@ -55,7 +56,6 @@ export default defineConfig(({ command, mode }) => ({
       transformMixedEsModules: true,
     },
     rollupOptions: {
-      external: ['react/jsx-runtime'],
       output: {
         format: 'es',
         entryFileNames: 'assets/[name]-[hash].js',
