@@ -55,7 +55,8 @@ export const signInWithGoogle = async () => {
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
-          response_type: 'code'
+          response_type: 'code',
+          site_url: callbackUrl.replace('/auth/callback', '')
         }
       }
     });
