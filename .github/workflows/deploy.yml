@@ -36,17 +36,18 @@ jobs:
         run: |
           npm run build
           # Create the dragonfly-expense-hub directory in dist
-          mkdir -p dist/dragonfly-expense-hub
+          mkdir -p dist/dragonfly-expense-hub/assets
           # Copy all files from dist to the subdirectory, excluding the subdirectory itself
           find dist -maxdepth 1 -type f -exec cp {} dist/dragonfly-expense-hub/ \;
-          find dist/assets -type f -exec cp {} dist/dragonfly-expense-hub/assets/ \;
-          # Copy PWA files to the correct location
-          cp -r public/icon-192x192.png dist/dragonfly-expense-hub/
-          cp -r public/icon-512x512.png dist/dragonfly-expense-hub/
-          cp -r public/screenshot-desktop.png dist/dragonfly-expense-hub/
-          cp -r public/screenshot-mobile.png dist/dragonfly-expense-hub/
-          cp -r public/favicon.ico dist/dragonfly-expense-hub/
-          cp -r public/site.webmanifest dist/dragonfly-expense-hub/
+          # Copy assets directory
+          cp -r dist/assets/* dist/dragonfly-expense-hub/assets/
+          # Copy PWA files to the correct location if they exist
+          [ -f public/icon-192x192.png ] && cp public/icon-192x192.png dist/dragonfly-expense-hub/
+          [ -f public/icon-512x512.png ] && cp public/icon-512x512.png dist/dragonfly-expense-hub/
+          [ -f public/screenshot-desktop.png ] && cp public/screenshot-desktop.png dist/dragonfly-expense-hub/
+          [ -f public/screenshot-mobile.png ] && cp public/screenshot-mobile.png dist/dragonfly-expense-hub/
+          [ -f public/favicon.ico ] && cp public/favicon.ico dist/dragonfly-expense-hub/
+          [ -f public/site.webmanifest ] && cp public/site.webmanifest dist/dragonfly-expense-hub/
           # Move everything to the root for GitHub Pages
           cp -r dist/dragonfly-expense-hub/* .
         env:
