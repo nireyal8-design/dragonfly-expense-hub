@@ -36,15 +36,15 @@ export function GoogleSignInButton() {
       
       const result = await signInWithGoogle();
       
-      if (!result.url) {
+      if (!result?.url) {
         throw new Error('Failed to get Google sign-in URL');
       }
       
-      console.log('Google sign-in URL:', result.url);
+      console.log('Redirecting to Google sign-in URL:', result.url);
       window.location.href = result.url;
     } catch (error: any) {
       console.error('Error signing in with Google:', error);
-      toast.error('שגיאה בהתחברות עם Google');
+      toast.error(error.message || 'שגיאה בהתחברות עם Google');
     } finally {
       setIsLoading(false);
     }

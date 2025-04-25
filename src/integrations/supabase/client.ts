@@ -28,17 +28,30 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
 
 // Export a function to handle Google login with the correct redirect URL
 export const signInWithGoogle = async () => {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: getCallbackUrl()
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: getCallbackUrl(),
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent'
+        }
+      }
+    });
+    
+    if (error) {
+      console.error('Error signing in with Google:', error);
+      throw error;
     }
-  });
-  
-  if (error) {
-    console.error('Error signing in with Google:', error);
+    
+    if (!data.url) {
+      throw new Error('No URL returned from Google OAuth');
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error in signInWithGoogle:', error);
     throw error;
   }
-  
-  return data;
 };
