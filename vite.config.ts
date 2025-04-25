@@ -96,5 +96,8 @@ export default defineConfig(({ command, mode }) => ({
         rewrite: (path) => path.replace(/^\/auth\/callback/, '')
       }
     }
+  },
+  define: {
+    'process.env.BASE_URL': JSON.stringify('/dragonfly-expense-hub/')
   }
 }));

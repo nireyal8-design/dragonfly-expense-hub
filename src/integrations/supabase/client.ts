@@ -17,3 +17,10 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storageKey: 'supabase.auth.token'
   }
 });
+
+// Set the redirect URL after client creation
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN') {
+    window.location.href = `${window.location.origin}/dragonfly-expense-hub/auth/callback`;
+  }
+});
