@@ -13,6 +13,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/dragonfly-expense-hub/site.webmanifest",
+      "destination": "/site.webmanifest"
+    },
+    {
       "source": "/dragonfly-expense-hub/(.*)",
       "destination": "/$1"
     },
@@ -46,19 +50,6 @@
         {
           "key": "Content-Type",
           "value": "application/javascript"
-        }
-      ]
-    },
-    {
-      "source": "/dragonfly-expense-hub/site.webmanifest",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/manifest+json"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000"
         }
       ]
     },
