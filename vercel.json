@@ -13,10 +13,6 @@
       "destination": "/index.html"
     },
     {
-      "source": "/dragonfly-expense-hub/site.webmanifest",
-      "destination": "/site.webmanifest"
-    },
-    {
       "source": "/dragonfly-expense-hub/(.*)",
       "destination": "/$1"
     },
@@ -63,8 +59,23 @@
         {
           "key": "Access-Control-Allow-Origin",
           "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000"
         }
       ]
+    }
+  ],
+  "routes": [
+    {
+      "src": "/site.webmanifest",
+      "dest": "/site.webmanifest",
+      "headers": {
+        "Content-Type": "application/manifest+json",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "public, max-age=31536000"
+      }
     }
   ]
 } 
