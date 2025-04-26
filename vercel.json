@@ -66,16 +66,5 @@
         }
       ]
     }
-  ],
-  "routes": [
-    {
-      "src": "/site.webmanifest",
-      "dest": "/site.webmanifest",
-      "headers": {
-        "Content-Type": "application/manifest+json",
-        "Access-Control-Allow-Origin": "*",
-        "Cache-Control": "public, max-age=31536000"
-      }
-    }
   ]
 } 
