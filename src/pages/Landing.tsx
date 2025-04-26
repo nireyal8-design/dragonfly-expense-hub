@@ -7,20 +7,32 @@ import { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function Landing() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   console.log('Landing component rendering...');
   console.log('User state:', user);
+  console.log('Loading state:', loading);
 
   useEffect(() => {
     console.log('Landing useEffect running...');
-    if (user) {
+    if (!loading && user) {
       console.log('User is authenticated, redirecting to dashboard...');
       navigate('/dashboard');
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
+  if (loading) {
+    console.log('Landing: Still loading auth state...');
+    return <div>Loading...</div>;
+  }
+
+  if (user) {
+    console.log('Landing: User is authenticated, showing loading state...');
+    return <div>Redirecting to dashboard...</div>;
+  }
+
+  console.log('Landing: Rendering landing page content...');
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
@@ -34,7 +46,6 @@ export default function Landing() {
               <Button 
                 size="lg" 
                 className="bg-dragonfly-500 hover:bg-dragonfly-600 text-white"
-                onClick={() => navigate('/register')}
               >
                 התחל עכשיו
               </Button>
