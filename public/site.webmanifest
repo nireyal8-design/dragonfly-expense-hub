@@ -3,37 +3,38 @@
   "short_name": "SpendWise",
   "description": "Expense tracking and budget management application",
   "start_url": "/dragonfly-expense-hub/",
+  "scope": "/dragonfly-expense-hub/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0f172a",
   "icons": [
     {
-      "src": "icon-192x192.png",
+      "src": "/dragonfly-expense-hub/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icon-512x512.png",
+      "src": "/dragonfly-expense-hub/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "manifest-icon-192.maskable.png",
+      "src": "/dragonfly-expense-hub/manifest-icon-192.maskable.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "favicon.ico",
+      "src": "/dragonfly-expense-hub/favicon.ico",
       "sizes": "48x48",
       "type": "image/x-icon"
     }
   ],
   "screenshots": [
     {
-      "src": "screenshot-mobile.png",
+      "src": "/dragonfly-expense-hub/screenshot-mobile.png",
       "sizes": "750x1334",
       "type": "image/png",
       "label": "SpendWise Mobile View"
