@@ -59,10 +59,6 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
         }
       ]
     },
@@ -78,17 +74,6 @@
           "value": "public, max-age=31536000"
         }
       ]
-    }
-  ],
-  "routes": [
-    {
-      "src": "/dragonfly-expense-hub/site.webmanifest",
-      "dest": "/site.webmanifest",
-      "headers": {
-        "Content-Type": "application/manifest+json",
-        "Cache-Control": "public, max-age=31536000",
-        "Access-Control-Allow-Origin": "*"
-      }
     }
   ]
 } 
