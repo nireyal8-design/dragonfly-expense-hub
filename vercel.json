@@ -13,6 +13,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/dragonfly-expense-hub/site.webmanifest",
+      "destination": "/site.webmanifest"
+    },
+    {
       "source": "/dragonfly-expense-hub/(.*)",
       "destination": "/$1"
     },
@@ -65,6 +69,15 @@
           "value": "public, max-age=31536000"
         }
       ]
+    }
+  ],
+  "routes": [
+    {
+      "src": "/dragonfly-expense-hub/(.*)",
+      "dest": "/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000"
+      }
     }
   ]
 } 
