@@ -50,7 +50,7 @@
       ]
     },
     {
-      "source": "/site.webmanifest",
+      "source": "/dragonfly-expense-hub/site.webmanifest",
       "headers": [
         {
           "key": "Content-Type",
