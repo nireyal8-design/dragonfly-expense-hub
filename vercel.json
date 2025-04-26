@@ -24,23 +24,15 @@
         {
           "key": "Content-Language",
           "value": "he"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
         }
       ]
     },
     {
-      "source": "/assets/(.*)",
+      "source": "/assets/(.*).js",
       "headers": [
         {
           "key": "Content-Type",
-          "value": "text/javascript"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
+          "value": "application/javascript"
         }
       ]
     },
@@ -49,11 +41,7 @@
       "headers": [
         {
           "key": "Content-Type",
-          "value": "text/javascript"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
+          "value": "application/javascript"
         }
       ]
     },
@@ -63,10 +51,6 @@
         {
           "key": "Content-Type",
           "value": "application/manifest+json"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
         }
       ]
     }
