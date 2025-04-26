@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Landing from '@/pages/Landing';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
@@ -14,7 +14,9 @@ import { SecurityBenefits } from '@/components/features/SecurityBenefits';
 import { CloudSyncBenefits } from '@/components/features/CloudSyncBenefits';
 
 export function AppRoutes() {
+  const location = useLocation();
   console.log('AppRoutes component rendering...');
+  console.log('Current route:', location.pathname);
   
   return (
     <Routes>

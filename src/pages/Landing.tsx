@@ -3,9 +3,23 @@ import { Logo } from "@/components/Logo";
 import { Link, useNavigate } from "react-router-dom";
 import { CardHover } from "@/components/ui/card-hover";
 import { CreditCard, PieChart, TrendingUp, Zap, Shield, Clock } from "lucide-react";
+import { useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Landing() {
+  const { user } = useAuth();
   const navigate = useNavigate();
+
+  console.log('Landing component rendering...');
+  console.log('User state:', user);
+
+  useEffect(() => {
+    console.log('Landing useEffect running...');
+    if (user) {
+      console.log('User is authenticated, redirecting to dashboard...');
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   return (
     <div className="flex min-h-screen flex-col">
