@@ -1,66 +1,51 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
+import { RouteLogger } from '@/components/RouteLogger';
+import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
-import Landing from "./pages/Landing";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
-import NotFound from "./pages/NotFound";
-import AuthCallback from "./pages/AuthCallback";
-import Settings from "./pages/Settings";
-import { ExpenseTrackingBenefits } from "@/components/features/ExpenseTrackingBenefits";
-import { ReportsBenefits } from "@/components/features/ReportsBenefits";
-import { BudgetManagementBenefits } from "@/components/features/BudgetManagementBenefits";
-import { TimeSavingsBenefits } from "@/components/features/TimeSavingsBenefits";
-import { SecurityBenefits } from "@/components/features/SecurityBenefits";
-import { CloudSyncBenefits } from "@/components/features/CloudSyncBenefits";
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { AppRoutes } from '@/routes';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
-// Add a component to log route changes
-const RouteLogger = () => {
-  const location = useLocation();
-  console.log('Route changed:', location.pathname);
-  return null;
-};
+console.log('App component initializing...');
+console.log('Supabase client initialized:', !!supabase);
+console.log('Query client initialized:', !!queryClient);
 
-const App = () => {
+export function App() {
   console.log('App component rendering...');
-  return (
-    <SessionContextProvider supabaseClient={supabase}>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter basename="/dragonfly-expense-hub">
-              <RouteLogger />
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
-                <Route path="/expense-tracking-benefits" element={<ExpenseTrackingBenefits />} />
-                <Route path="/reports-benefits" element={<ReportsBenefits />} />
-                <Route path="/budget-management-benefits" element={<BudgetManagementBenefits />} />
-                <Route path="/time-savings-benefits" element={<TimeSavingsBenefits />} />
-                <Route path="/security-benefits" element={<SecurityBenefits />} />
-                <Route path="/cloud-sync-benefits" element={<CloudSyncBenefits />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </SessionContextProvider>
-  );
-};
+  console.log('Current path:', window.location.pathname);
+  console.log('Environment variables:', {
+    BASE_URL: import.meta.env.BASE_URL,
+    MODE: import.meta.env.MODE,
+    VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
+  });
 
-export default App;
+  return (
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <RouteLogger />
+      <SessionContextProvider supabaseClient={supabase}>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <AuthProvider>
+              <TooltipProvider>
+                <AppRoutes />
+                <Toaster />
+              </TooltipProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </SessionContextProvider>
+    </BrowserRouter>
+  );
+}
