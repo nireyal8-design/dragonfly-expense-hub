@@ -60,8 +60,8 @@ export default defineConfig(({ command, mode }) => ({
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
-        
-        inlineDynamicImports: true
+        manualChunks: undefined,
+        inlineDynamicImports: false
       }
     },
     assetsInclude: ['**/*.png', '**/*.ico', '**/*.webmanifest'],

@@ -13,6 +13,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/dragonfly-expense-hub/(.*)",
+      "destination": "/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
@@ -28,7 +32,7 @@
       ]
     },
     {
-      "source": "/assets/(.*).js",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Content-Type",
