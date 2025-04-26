@@ -8,7 +8,6 @@ import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AppRoutes } from '@/routes';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,24 +32,20 @@ export function App() {
   });
 
   return (
-    <ErrorBoundary>
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
-        <RouteLogger />
-        <SessionContextProvider supabaseClient={supabase}>
-          <QueryClientProvider client={queryClient}>
-            <ThemeProvider>
-              <AuthProvider>
-                <TooltipProvider>
-                  <div className="app-container">
-                    <AppRoutes />
-                    <Toaster />
-                  </div>
-                </TooltipProvider>
-              </AuthProvider>
-            </ThemeProvider>
-          </QueryClientProvider>
-        </SessionContextProvider>
-      </BrowserRouter>
-    </ErrorBoundary>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <RouteLogger />
+      <SessionContextProvider supabaseClient={supabase}>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <AuthProvider>
+              <TooltipProvider>
+                <AppRoutes />
+                <Toaster />
+              </TooltipProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </SessionContextProvider>
+    </BrowserRouter>
   );
 }
