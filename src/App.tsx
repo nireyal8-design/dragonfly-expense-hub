@@ -39,8 +39,10 @@ export function App() {
           <ThemeProvider>
             <AuthProvider>
               <TooltipProvider>
-                <AppRoutes />
-                <Toaster />
+                <div className="app-container">
+                  <AppRoutes />
+                  <Toaster />
+                </div>
               </TooltipProvider>
             </AuthProvider>
           </ThemeProvider>
